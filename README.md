@@ -1,1 +1,1 @@
-# flask
+Week08～10課題「FlaskでWebサービスを作成する」用Dockerファイルのサンプルです
