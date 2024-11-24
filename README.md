@@ -2,6 +2,20 @@ Week08～10課題「FlaskでWebサービスを作成する」用Dockerファイ�
 
 以下の手順で環境を構築します。
 --- Linux ---
+1. TeraTermでログインする
+プロンプトが「[user2@week08 ~]$」であるならばOK
+
+2. リポジトリをクローンする
+git clone https://github.com/（自分のGitHubアカウント）/flask.git
+
+3. カレントディレクトリを「flask」へ変更する
+cd flask
+
+4. Dockerでcompose upする
+docker compose down; docker compose up -d --build
+
+5. WindowsのWebブラウザーで「http://192.168.56.102:5000/」にアクセスする
+アプリ画面が表示したらOK
 
 --- Windows ---
 1. コマンドプロンプトを開く
