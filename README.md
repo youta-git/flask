@@ -52,6 +52,7 @@ launch.jsonを保存して閉じる
 ターミナルでも、Flask開発用環境に入る
 .\.venv\Scripts\activate
 左側のツリービューから「src\app.py」を開く
+右下の表示が「Python 3.12.6('.venv')」になっていることを確認する。「Python 3.12.6('.venv')」以外になっている場合は切り替える
 F5キーを押す
 ターミナルに「* Running on http://127.0.0.1:5000」と表示するので、Ctrlキーを押しながらURLをクリックする
 Webブラウザーが開き、アプリ画面が表示したらOK
