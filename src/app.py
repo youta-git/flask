@@ -39,18 +39,20 @@ def tomorrow_plan() -> str:
     tomorrow_dt_str = f"{tomorrow_dt.strftime('%Y/%m/%d')}({DAY_NAME[tomorrow_dt.weekday()]})"
 
     # 明日の天気予報
-    weather_osaka = weather_forecast.weather_in_osaka_tomorrow()
+    weather_osaka = weather_forecast.get_osaka_tomorrow_weather()
 
     # 明日の時間割
-    timetable = school_timetable.tomorrow_school_timetable()
+    tomorrow_lessons = school_timetable.get_tomorrow_timetable()
+    timetable = [[lesson.period, lesson.subject, lesson.classroom, lesson.teacher] for lesson in tomorrow_lessons]
 
     # おみくじを引く
     if request.method == "POST":
-        fortune = omikuji.Omikuji.draw()
+        fortune = omikuji.draw()
+        fortune_result = fortune.result.value
+        fortune_advice = fortune.advice
     else:  # GET
-        fortune = omikuji.Fortune
-        fortune.result = ""
-        fortune.advice = ""
+        fortune_result = ""
+        fortune_advice = ""
 
     return render_template(
         "./tomorrow_plan.html",
@@ -58,6 +60,6 @@ def tomorrow_plan() -> str:
         weather_area="大阪",
         weather_result=weather_osaka,
         school_timetable=timetable,
-        fortune_result=fortune.result,
-        fortune_advice=Markup(fortune.advice.replace("\n", "<br>")),
+        fortune_result=fortune_result,
+        fortune_advice=Markup(fortune_advice.replace("\n", "<br>")),
     )
