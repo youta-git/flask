@@ -1,65 +1,34 @@
-# -*- coding: utf-8 -*-
-"""Webアプリのサンプルです"""
+import random
 
-# ライブラリのインポート
-from datetime import datetime, timedelta
+from flask import Flask, render_template, request, session
 
-from flask import Flask, render_template, request
-from markupsafe import Markup
-
-import omikuji
-import school_timetable
-import weather_forecast
-
-# Flaskのインスタンス化
-application = Flask(__name__, static_folder="static", template_folder="templates")
+app = Flask(__name__)
+app.secret_key = "secret_key"  # セッションを使うために必要
 
 
-@application.route("/")
-@application.route("/index")
-def index() -> str:
-    """トップページ
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if "secret_number" not in session:
+        session["secret_number"] = random.randint(1, 100)
+        session["attempts"] = 0
+        session["message"] = ""
 
-    Returns:
-        str: レンダリング結果
-    """
-    return render_template("./index.html")
-
-
-@application.route("/tomorrow_plan", methods=["GET", "POST"])
-def tomorrow_plan() -> str:
-    """明日の予定を表示する
-
-    Returns:
-        str: レンダリング結果
-    """
-    # 明日の日付（曜日表示付き）
-    DAY_NAME = "月火水木金土日"
-    tomorrow_dt = datetime.now() + timedelta(days=1)
-    tomorrow_dt_str = f"{tomorrow_dt.strftime('%Y/%m/%d')}({DAY_NAME[tomorrow_dt.weekday()]})"
-
-    # 明日の天気予報
-    weather_osaka = weather_forecast.get_osaka_tomorrow_weather()
-
-    # 明日の時間割
-    tomorrow_lessons = school_timetable.get_tomorrow_timetable()
-    timetable = [[lesson.period, lesson.subject, lesson.classroom, lesson.teacher] for lesson in tomorrow_lessons]
-
-    # おみくじを引く
     if request.method == "POST":
-        fortune = omikuji.draw()
-        fortune_result = fortune.result.value
-        fortune_advice = fortune.advice
-    else:  # GET
-        fortune_result = ""
-        fortune_advice = ""
+        guess = int(request.form["guess"])
+        session["attempts"] += 1
 
-    return render_template(
-        "./tomorrow_plan.html",
-        date=tomorrow_dt_str,
-        weather_area="大阪",
-        weather_result=weather_osaka,
-        school_timetable=timetable,
-        fortune_result=fortune_result,
-        fortune_advice=Markup(fortune_advice.replace("\n", "<br>")),
-    )
+        if guess == session["secret_number"]:
+            session["message"] = (
+                f'正解！ {session["secret_number"]} が正解でした。 {session["attempts"]}回で当てました。'
+            )
+            session.pop("secret_number", None)  # ゲームクリア時に秘密の数字を削除
+        elif guess < session["secret_number"]:
+            session["message"] = "もっと大きい数です。"
+        else:
+            session["message"] = "もっと小さい数です。"
+
+    return render_template("index.html", message=session["message"], attempts=session["attempts"])
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
